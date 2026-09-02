@@ -1,0 +1,154 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-jakarta);
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --font-heading: var(--font-jakarta);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) * 0.65);
+  --radius-md: calc(var(--radius) * 0.82);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.3);
+  --radius-2xl: calc(var(--radius) * 1.7);
+  --radius-3xl: calc(var(--radius) * 2.1);
+  --radius-4xl: calc(var(--radius) * 2.5);
+}
+
+:root {
+  --font-jakarta: 'Plus Jakarta Sans', 'Segoe UI', Arial, sans-serif;
+  --background: #f5f8fc;
+  --foreground: #172033;
+  --card: #ffffff;
+  --card-foreground: #172033;
+  --popover: #ffffff;
+  --popover-foreground: #172033;
+  --primary: #1a73e8;
+  --primary-foreground: #ffffff;
+  --secondary: #e7f6f3;
+  --secondary-foreground: #176d66;
+  --muted: #eef3f8;
+  --muted-foreground: #5b6b82;
+  --accent: #e8f3ff;
+  --accent-foreground: #1557a6;
+  --destructive: #c93647;
+  --border: #dce5ef;
+  --input: #cbd8e5;
+  --ring: #1a73e8;
+  --chart-1: #1a73e8;
+  --chart-2: #2a9d8f;
+  --chart-3: #f59e0b;
+  --chart-4: #7c69e8;
+  --chart-5: #64748b;
+  --radius: 0.8rem;
+  --sidebar: #ffffff;
+  --sidebar-foreground: #172033;
+  --sidebar-primary: #1a73e8;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #e8f3ff;
+  --sidebar-accent-foreground: #1557a6;
+  --sidebar-border: #dce5ef;
+  --sidebar-ring: #1a73e8;
+}
+
+.dark {
+  --background: #0e1726;
+  --foreground: #eef5ff;
+  --card: #152238;
+  --card-foreground: #eef5ff;
+  --popover: #152238;
+  --popover-foreground: #eef5ff;
+  --primary: #6aa8ff;
+  --primary-foreground: #071426;
+  --secondary: #183b3b;
+  --secondary-foreground: #9de8dc;
+  --muted: #1d2b42;
+  --muted-foreground: #a4b3c7;
+  --accent: #17365a;
+  --accent-foreground: #b7d6ff;
+  --destructive: #ff7b8a;
+  --border: #2a3b55;
+  --input: #344762;
+  --ring: #6aa8ff;
+  --chart-1: #6aa8ff;
+  --chart-2: #63d3c3;
+  --chart-3: #f7be5b;
+  --chart-4: #a99cf5;
+  --chart-5: #9aa9bb;
+  --sidebar: #111d30;
+  --sidebar-foreground: #eef5ff;
+  --sidebar-primary: #6aa8ff;
+  --sidebar-primary-foreground: #071426;
+  --sidebar-accent: #17365a;
+  --sidebar-accent-foreground: #b7d6ff;
+  --sidebar-border: #2a3b55;
+  --sidebar-ring: #6aa8ff;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  html {
+    @apply font-sans;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    min-width: 320px;
+  }
+
+  button,
+  a,
+  select,
+  input {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
