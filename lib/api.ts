@@ -125,7 +125,7 @@ export function apiDelete<T>(path: string, options?: ApiOptions) {
   return request<T>(path, { ...options, method: 'DELETE' });
 }
 
-export async function apiDownload(path: string, fileName: string) {
+export async function apiDownload(path: string, fileName: string, retry = true) {
   const session = getSession();
   if (!session) {
     clearSession();
@@ -143,7 +143,17 @@ export async function apiDownload(path: string, fileName: string) {
     throw new ApiError(connectionErrorMessage, 0);
   }
 
+  // Unduhan berumur panjang ikut alur refresh yang sama dengan request JSON,
+  // supaya tidak gagal hanya karena access token kedaluwarsa.
+  if (response.status === 401 && retry && session.refreshToken) {
+    refreshPromise ??= refreshAccessToken().finally(() => {
+      refreshPromise = null;
+    });
+    if (await refreshPromise) return apiDownload(path, fileName, false);
+  }
+
   if (!response.ok) {
+    if (response.status === 401) clearSession();
     let message = 'File belum dapat diunduh.';
     try {
       const payload = (await response.json()) as ApiEnvelope<unknown>;

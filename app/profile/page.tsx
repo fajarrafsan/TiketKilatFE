@@ -23,8 +23,9 @@ import { apiGet, apiPut } from '@/lib/api';
 import type { UserProfile } from '@/lib/types';
 
 export default function ProfilePage() {
+  // Tanpa role: backend mengizinkan USER dan ADMIN membuka /user/profile.
   return (
-    <RouteGuard role="USER">
+    <RouteGuard>
       <AppShell>
         <ProfileContent />
       </AppShell>

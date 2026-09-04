@@ -201,15 +201,43 @@ function PaymentContent() {
     setReturnedFromMidtrans(
       new URLSearchParams(window.location.search).get('from') === 'midtrans',
     );
+    const generation = pageGeneration.current;
+    let restored = false;
     try {
       const stored = window.sessionStorage.getItem(`astracom.booking.${code}`);
       if (stored) {
         const saved = JSON.parse(stored) as BookingCreateResponse;
         setPayment(saved);
         orderHint.current ??= midtransOrderId(saved.orderId, code);
+        restored = true;
       }
     } catch {
       // Still load the booking status when local storage is unavailable or malformed.
+    }
+    if (!restored) {
+      // Pesanan yang dibuka dari Riwayat atau tab lain tidak punya token di
+      // sessionStorage. Backend menyimpannya, jadi ambil dari sana alih-alih
+      // membiarkan pengguna tidak bisa membayar sama sekali.
+      void apiGet<BookingCreateResponse>(
+        `/user/${encodeURIComponent(code)}/pembayaran`,
+      )
+        .then((saved) => {
+          if (generation !== pageGeneration.current) return;
+          setPayment(saved);
+          orderHint.current ??= midtransOrderId(saved.orderId, code);
+          try {
+            window.sessionStorage.setItem(
+              `astracom.booking.${code}`,
+              JSON.stringify(saved),
+            );
+          } catch {
+            // Menyimpan salinan lokal hanya optimasi; token tetap ada di backend.
+          }
+        })
+        .catch(() => {
+          // Pesanan lunas, batal, atau lama tanpa token tersimpan tidak punya
+          // tautan bayar. Halaman sudah menampilkan panduan untuk keadaan itu.
+        });
     }
     void loadDetail(true);
     const polling = window.setInterval(() => {
@@ -507,10 +535,10 @@ function PaymentContent() {
                   <Alert className="legacy-warning-surface mt-7 border p-3">
                     <Info />
                     <AlertDescription className="text-current">
-                      Tautan pembayaran tidak tersedia. Buka pesanan dari
-                      browser dan tab tempat pemesanan dibuat. Jika kamu sudah
-                      membayar, jangan buat pembayaran ulang; periksa status
-                      atau hubungi pengelola.
+                      Tautan pembayaran tidak tersedia untuk pesanan ini.
+                      Kemungkinan pesanan dibuat sebelum token pembayaran mulai
+                      disimpan. Jika kamu sudah membayar, jangan bayar ulang;
+                      gunakan Periksa sekarang atau hubungi pengelola.
                     </AlertDescription>
                   </Alert>
                 )}
