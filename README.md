@@ -1,41 +1,180 @@
-# TiketKilat Frontend
+<p align="center">
+  <img src="./public/favicon.svg" width="88" height="88" alt="Logo TiketKilat" />
+</p>
 
-Frontend aplikasi tiket pesawat TiketKilat menggunakan React, TypeScript, Tailwind CSS, dan komponen shadcn.
+<h1 align="center">TiketKilat Frontend</h1>
 
-## Menjalankan lokal
+<p align="center">
+  Pengalaman pemesanan tiket pesawat yang cepat, jelas, dan nyaman—dari mencari penerbangan sampai mengunduh e-tiket.
+</p>
 
-1. Salin `.env.example` menjadi `.env.local`.
-2. Pastikan backend Spring Boot berjalan di `http://localhost:8090`.
-3. Jalankan frontend pada port `3001`; backend lokal sudah mengizinkan origin tersebut.
+<p align="center">
+  <img alt="React 19.2" src="https://img.shields.io/badge/React-19.2-61DAFB?style=for-the-badge&logo=react&logoColor=08131f" />
+  <img alt="TypeScript 5.9" src="https://img.shields.io/badge/TypeScript-5.9-3178C6?style=for-the-badge&logo=typescript&logoColor=white" />
+  <img alt="Tailwind CSS 4.2" src="https://img.shields.io/badge/Tailwind_CSS-4.2-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white" />
+  <img alt="Node.js 22.13 atau lebih baru" src="https://img.shields.io/badge/Node.js-%E2%89%A522.13-5FA04E?style=for-the-badge&logo=nodedotjs&logoColor=white" />
+  <img alt="76 automated tests" src="https://img.shields.io/badge/tests-76_passing-22C55E?style=for-the-badge&logo=checkmarx&logoColor=white" />
+</p>
 
-```bash
+<p align="center">
+  <a href="https://github.com/fajarrafsan/TiketKilatBE"><strong>Backend repository</strong></a>
+</p>
+
+![Tampilan TiketKilat](./public/og.png)
+
+## Tentang TiketKilat
+
+TiketKilat adalah frontend web pemesanan tiket pesawat dengan alur end-to-end untuk pengguna dan panel operasional untuk admin. Antarmukanya responsif, menggunakan Bahasa Indonesia, serta memiliki navigasi, state loading/error/empty, dan fokus keyboard yang konsisten.
+
+Alur utama pengguna:
+
+**Cari penerbangan → isi data & unggah KTP → bayar melalui Midtrans → pilih kursi → unduh e-tiket**
+
+## Fitur
+
+### Untuk pengguna
+
+- Pencarian berdasarkan kota asal, tujuan, tanggal, dan maskapai.
+- Katalog dengan filter rentang harga dan waktu keberangkatan serta urutan termurah, tercepat, atau paling awal.
+- Registrasi, login, refresh token otomatis, dan reset password berbasis OTP.
+- Pemesanan satu penumpang dengan unggahan KTP berformat JPG, PNG, atau PDF hingga 2 MB.
+- Pembayaran Midtrans Snap di dalam halaman, tanpa membuka tab baru.
+- Sinkronisasi status pembayaran dengan backend dan pemulihan transaksi lama menggunakan Order ID.
+- Peta kursi interaktif, riwayat pesanan, profil, perubahan password, dan unduhan e-tiket PDF.
+
+### Untuk admin
+
+- Dashboard ringkasan penerbangan, booking, dan tiket terjual.
+- Tambah, ubah, hapus, urutkan, dan paginasi data penerbangan.
+- Daftar penumpang per penerbangan serta ekspor histori perubahan.
+- Pencarian dan filter histori booking serta pembatalan pesanan.
+- Route guard terpisah untuk hak akses `USER` dan `ADMIN`.
+
+## Teknologi
+
+| Bagian | Teknologi |
+| --- | --- |
+| UI | React 19, TypeScript, Tailwind CSS 4 |
+| Runtime web | Vinext, Vite, React Server Components |
+| Komponen | shadcn, Base UI, Lucide React |
+| Form & interaksi | React Day Picker, Input OTP, Embla Carousel |
+| Visualisasi | Recharts |
+| Runtime lokal hasil build | Wrangler / Cloudflare Workers |
+| Quality tools | Oxlint, Oxfmt, Node.js Test Runner |
+
+## Mulai secara lokal
+
+### Prasyarat
+
+- Node.js `22.13.0` atau lebih baru.
+- pnpm.
+- [TiketKilat Backend](https://github.com/fajarrafsan/TiketKilatBE) berjalan di `http://localhost:8090`.
+
+### Instalasi
+
+```powershell
+git clone https://github.com/fajarrafsan/TiketKilatFE.git
+Set-Location TiketKilatFE
+pnpm install
+Copy-Item .env.example .env.local
 pnpm dev -- --port 3001
 ```
 
-## Alur yang tersedia
+Buka [http://localhost:3001](http://localhost:3001). Backend perlu mengizinkan origin tersebut pada konfigurasi CORS.
 
-- Autentikasi: login, registrasi, lupa password dengan OTP, dan refresh token otomatis.
-- Pengguna: pencarian penerbangan, booking dan upload KTP, pembayaran Midtrans, pilih kursi, riwayat, serta profil.
-- Admin: dashboard, CRUD penerbangan, daftar penumpang, ekspor histori, dan pengelolaan booking.
+## Environment variables
 
-## Catatan kontrak backend
+Isi `.env.local` berdasarkan `.env.example`:
 
-### Midtrans lokal: popup di dalam halaman
+```dotenv
+NEXT_PUBLIC_API_BASE_URL=http://localhost:8090
+NEXT_PUBLIC_SITE_URL=http://localhost:3001
+NEXT_PUBLIC_MIDTRANS_CLIENT_KEY=
+```
 
-- Dashboard Midtrans pada akun ini menolak Finish URL `localhost`/IP. Jangan gunakan URL lokal tersebut sebagai pengaturan dashboard.
-- Tombol bayar sekarang memakai **Snap.js popup**, bukan membuka tab atau meninggalkan TiketKilat. Isi `NEXT_PUBLIC_MIDTRANS_CLIENT_KEY` di `.env.local` dengan **Client Key publik** dari akun/lingkungan Midtrans yang sama dengan backend. Jangan pernah menyalin Server Key ke frontend. Muat ulang frontend jika konfigurasi baru belum terbaca.
-- Lingkungan SDK (Sandbox/Production) mengikuti `redirectUrl` yang dikembalikan backend. URL SDK hanya boleh berasal dari host resmi Midtrans.
-- Semua callback (`onSuccess`, `onPending`, `onError`, `onClose`) ditangani di halaman pesanan. Alur hasil standar tidak bergantung pada Finish URL dashboard. Snap menutup popup sesudah callback; frontend tidak memanggil `hide()` dua kali. `onClose` tidak membatalkan pesanan, dan `onPending` tidak berarti lunas.
-- Selama popup terbuka, status backend tetap diperiksa. Ketika backend mengonfirmasi lunas, popup ditutup otomatis dan halaman menampilkan langkah pilih kursi. Jika jaringan/SDK gagal dimuat, tampil pesan yang bisa dicoba ulang, bukan menunggu tanpa batas.
-- `uiMode: 'qr'` menjaga alur GoPay/ShopeePay berbasis QR. Metode pihak ketiga yang tetap memerlukan perpindahan ke aplikasi/situs lain (misalnya direct debit/BNPL tertentu) dapat tetap membutuhkan **Finish URL domain publik milik sendiri**. Untuk alur itu, gunakan `<origin-frontend-publik>/payment/finish`; jangan memakai domain contoh atau domain pihak lain. Tidak ada domain, tunnel, atau deployment yang dibuat oleh perubahan ini.
-- Route `/payment/finish` membaca `order_id` berformat `ASTRA-XXXXXXXX-<13 angka>` dan meneruskannya sebagai petunjuk pencarian ke halaman booking. Jika order ID tidak dikirim, dipakai booking terakhir pada tab itu, atau riwayat jika tidak ada. Parameter status dari browser tidak dipercaya.
-- Halaman pembayaran memeriksa status setiap 8 detik, sesudah callback, dan lewat **Periksa sekarang**. Request tidak ditumpuk. `POST /user/{kodeBooking}/sync-payment` memeriksa pemilik pesanan sebelum backend menghubungi **Get Status API Midtrans** memakai Server Key. Order ID, nominal, mata uang, dan status sukses diperiksa sebelum mengubah status menjadi `SUDAH_DIBAYAR`. Pemeriksaan berhenti setelah lunas. Gangguan jaringan/404 transaksi yang belum dimulai tidak dianggap sebagai pembayaran atau pembatalan.
-- **Pesanan baru:** backend menyimpan `midtransOrderId` sebelum meminta token Snap, mengembalikannya sebagai `orderId` pada hasil booking dan `midtransOrderId` pada detail. **Pesanan lama:** gunakan Order ID dari callback/URL kembali atau formulir **Pulihkan status pesanan lama** dengan Order ID lengkap dari dashboard Midtrans. Jangan menebak timestamp, memakai Snap token sebagai Order ID, memasukkan Server Key, atau membayar ulang. ID dari formulir hanya petunjuk; backend tetap memverifikasinya.
-- Restart backend **secara manual** setelah perubahan ini. Konfigurasi lokal `spring.jpa.hibernate.ddl-auto=update` menambahkan kolom nullable `midtrans_order_id`; tidak ada data pembayaran lama yang ditandai lunas secara manual. Pengujian otomatis menggunakan mock, bukan transaksi Midtrans/database asli.
-- **Payment Notification URL terpisah:** `/payment/notification` tetap membutuhkan alamat backend yang dapat dijangkau internet. Handler memeriksa signature lalu mengambil status terkini dari Midtrans; kegagalan sementara mengembalikan 5xx agar dapat dicoba ulang. Untuk pengembangan localhost tanpa tunnel, sinkronisasi melalui halaman pembayaran dapat bekerja selama backend dapat menghubungi Midtrans. Jika halaman ditutup dan webhook tidak terjangkau, buka lagi halaman pembayaran untuk memeriksa status. Status lunas dilindungi dari penimpaan proses pembatalan/kedaluwarsa.
+| Variable | Kegunaan |
+| --- | --- |
+| `NEXT_PUBLIC_API_BASE_URL` | Base URL REST API TiketKilat. |
+| `NEXT_PUBLIC_SITE_URL` | Origin frontend untuk metadata dan URL publik situs. |
+| `NEXT_PUBLIC_MIDTRANS_CLIENT_KEY` | Client Key publik Midtrans dari environment yang sama dengan backend. |
 
-Referensi: [Snap.js popup dan callback](https://docs.midtrans.com/reference/snap-js), [Get Transaction Status](https://docs.midtrans.com/reference/get-transaction-status), [HTTP notifications](https://docs.midtrans.com/docs/https-notification-webhooks).
+> [!IMPORTANT]
+> Semua variable berawalan `NEXT_PUBLIC_` dapat dibaca browser. Jangan pernah menaruh `MIDTRANS_SERVER_KEY`, password, atau secret backend di repository maupun frontend.
 
-### Unduh tiket
+## Perintah pengembangan
 
-Endpoint unduh PDF membutuhkan `tiketId`. Tombol unduh frontend akan aktif ketika field tersebut tersedia pada detail atau riwayat booking.
+| Perintah | Fungsi |
+| --- | --- |
+| `pnpm dev -- --port 3001` | Menjalankan development server di port 3001. |
+| `pnpm build` | Membuat production build. |
+| `pnpm start` | Menjalankan hasil build melalui Wrangler. |
+| `pnpm lint` | Memeriksa source code dengan Oxlint. |
+| `pnpm format` | Memformat source code dengan Oxfmt. |
+| `pnpm exec tsc --noEmit` | Memeriksa tipe TypeScript tanpa membuat output. |
+| `node --test tests/*.test.cjs` | Menjalankan seluruh automated test. |
+
+Suite saat ini mencakup 76 skenario untuk autentikasi, katalog penerbangan, pencarian, navigasi, keamanan URL Midtrans, callback Snap, sinkronisasi pembayaran, dan alur kembali dari payment gateway.
+
+## Struktur proyek
+
+```text
+TiketKilatFE/
+├── app/                 # Route dan halaman aplikasi
+│   ├── admin/           # Dashboard, penerbangan, dan booking admin
+│   ├── payment/         # Checkout dan return handler Midtrans
+│   └── seats/           # Pemilihan kursi dan e-tiket
+├── components/          # Shell, navigasi, form, card, dan komponen UI
+│   └── ui/              # Primitive UI reusable
+├── hooks/               # State dan fetching katalog penerbangan
+├── lib/                 # API client, session, formatter, tipe, dan helper domain
+├── public/              # Logo, Open Graph image, dan aset destinasi
+└── tests/               # Automated test berbasis Node.js Test Runner
+```
+
+## Integrasi backend
+
+API client menambahkan Bearer token untuk route terlindungi dan melakukan satu proses refresh bersama ketika beberapa request menerima `401` bersamaan. Respons `403` tetap diperlakukan sebagai penolakan izin, bukan sebagai alasan untuk melakukan refresh berulang.
+
+Kontrak API dan implementasi server berada di [TiketKilatBE](https://github.com/fajarrafsan/TiketKilatBE). Saat origin, port, atau environment backend berubah, sesuaikan `NEXT_PUBLIC_API_BASE_URL` dan konfigurasi CORS backend secara bersamaan.
+
+<details>
+<summary><strong>Catatan integrasi Midtrans</strong></summary>
+
+- Checkout menggunakan Snap.js popup di halaman yang sama; frontend tidak memanggil `window.open`.
+- SDK hanya dimuat dari host checkout resmi `app.sandbox.midtrans.com` atau `app.midtrans.com`, berdasarkan `redirectUrl` yang diberikan backend.
+- Callback browser dan parameter return URL hanya menjadi pemicu pemeriksaan. Status lunas tetap mengikuti hasil verifikasi backend ke Midtrans.
+- Halaman pembayaran memeriksa status secara berkala setiap 8 detik dan menyediakan tombol **Periksa sekarang** tanpa menumpuk request.
+- Route `/payment/finish` mengarahkan kembali ke booking yang sesuai bila menerima Order ID yang valid. Nilai `transaction_status` dari URL tidak dipercaya sebagai bukti pembayaran.
+- `GET /user/{kodeBooking}/pembayaran` mengambil kembali Snap token milik transaksi yang sama saat halaman dibuka dari riwayat, tab lain, atau perangkat lain. Endpoint ini tidak membuat transaksi baru. Pesanan lama tanpa token mendapat respons `428` dan diarahkan ke pemulihan menggunakan Order ID.
+- Dashboard Midtrans tidak menerima `localhost` atau IP sebagai Finish URL. Alur popup lokal tidak bergantung pada Finish URL tersebut. Untuk callback redirect publik, gunakan domain frontend milik sendiri dengan path `/payment/finish`.
+- Payment Notification URL harus mengarah ke backend yang dapat dijangkau internet. Saat backend masih lokal tanpa tunnel, status dapat dipulihkan dengan membuka kembali halaman pembayaran agar backend menjalankan sinkronisasi.
+- Server Key hanya boleh disimpan di backend. Frontend memerlukan Client Key publik dari akun dan environment Midtrans yang sama.
+- Mode dan prefiks key harus sepadan: Sandbox memakai `SB-Mid-server-*`/`SB-Mid-client-*` dengan `MIDTRANS_IS_PRODUCTION=false`, sedangkan Production memakai `Mid-server-*`/`Mid-client-*` dengan `MIDTRANS_IS_PRODUCTION=true`.
+
+</details>
+
+E-tiket baru dapat diunduh ketika backend mengirim `tiketId` pada detail atau riwayat booking. Nilainya masih `null` sebelum kursi dipilih.
+
+## Route utama
+
+| Akses | Route |
+| --- | --- |
+| Publik | `/`, `/login`, `/register`, `/forgot-password` |
+| Pengguna | `/flights`, `/booking`, `/payment/[code]`, `/seats/[code]`, `/history`, `/profile` |
+| Admin | `/admin`, `/admin/flights`, `/admin/bookings` |
+
+## Verifikasi sebelum push
+
+```powershell
+pnpm lint
+pnpm exec tsc --noEmit
+node --test tests/*.test.cjs
+pnpm build
+```
+
+---
+
+<p align="center">
+  <strong>TiketKilat</strong><br />
+  Pilih rute. Siap berangkat.
+</p>
