@@ -1,9 +1,21 @@
 'use client';
 
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 
 import { apiPost } from '@/lib/api';
-import { clearSession, getSession, setSession, subscribeToSession } from '@/lib/session';
+import {
+  clearSession,
+  getSession,
+  setSession,
+  subscribeToSession,
+} from '@/lib/session';
 import type { AuthResponse, AuthSession } from '@/lib/types';
 
 interface AuthContextValue {
@@ -47,7 +59,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const current = getSession();
     try {
       if (current?.refreshToken) {
-        await apiPost('/auth/logout', { refreshToken: current.refreshToken }, { auth: false });
+        await apiPost(
+          '/auth/logout',
+          { refreshToken: current.refreshToken },
+          { auth: false },
+        );
       }
     } finally {
       clearSession();
@@ -55,7 +71,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  const value = useMemo(() => ({ session, ready, login, logout }), [session, ready, login, logout]);
+  const value = useMemo(
+    () => ({ session, ready, login, logout }),
+    [session, ready, login, logout],
+  );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

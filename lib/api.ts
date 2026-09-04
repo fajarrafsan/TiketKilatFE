@@ -1,8 +1,10 @@
 import { clearSession, getSession, setSession } from '@/lib/session';
+import { API_BASE_URL } from '@/lib/config';
 import type { ApiEnvelope, AuthResponse } from '@/lib/types';
 
-export const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:8080';
+export { API_BASE_URL } from '@/lib/config';
+
+const connectionErrorMessage = `Tidak dapat terhubung ke API di ${API_BASE_URL}. Pastikan backend berjalan dan origin frontend diizinkan.`;
 
 export class ApiError extends Error {
   status: number;
@@ -54,6 +56,10 @@ async function refreshAccessToken() {
 async function request<T>(path: string, options: ApiOptions = {}, retry = true) {
   const { body, auth = true, headers: customHeaders, ...requestOptions } = options;
   const session = getSession();
+  if (auth && !session) {
+    clearSession();
+    throw new ApiError('Sesi tidak tersedia. Silakan masuk kembali.', 401);
+  }
   const headers = new Headers(customHeaders);
   let requestBody = body as BodyInit | null | undefined;
 
@@ -74,10 +80,7 @@ async function request<T>(path: string, options: ApiOptions = {}, retry = true) 
       body: requestBody,
     });
   } catch {
-    throw new ApiError(
-      'Tidak dapat terhubung ke server. Pastikan backend berjalan di localhost:8080.',
-      0,
-    );
+    throw new ApiError(connectionErrorMessage, 0);
   }
 
   if (response.status === 401 && auth && retry && session?.refreshToken) {
@@ -124,6 +127,10 @@ export function apiDelete<T>(path: string, options?: ApiOptions) {
 
 export async function apiDownload(path: string, fileName: string) {
   const session = getSession();
+  if (!session) {
+    clearSession();
+    throw new ApiError('Sesi tidak tersedia. Silakan masuk kembali.', 401);
+  }
   let response: Response;
 
   try {
@@ -133,7 +140,7 @@ export async function apiDownload(path: string, fileName: string) {
         : undefined,
     });
   } catch {
-    throw new ApiError('Tidak dapat terhubung ke server.', 0);
+    throw new ApiError(connectionErrorMessage, 0);
   }
 
   if (!response.ok) {

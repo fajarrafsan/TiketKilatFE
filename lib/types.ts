@@ -48,6 +48,7 @@ export interface Seat {
 
 export interface BookingCreateResponse {
   kodeBooking: string;
+  orderId?: string;
   snapToken: string;
   redirectUrl: string;
   totalHarga: string | number;
@@ -55,6 +56,7 @@ export interface BookingCreateResponse {
 
 export interface BookingDetail {
   kodeBooking: string;
+  midtransOrderId?: string | null;
   namaPenumpang: string;
   noHP: string;
   maskapai: string;

@@ -32,7 +32,9 @@ export default function LoginPage() {
       const fallback = session.role === 'ADMIN' ? '/admin' : '/flights';
       router.replace(requested?.startsWith('/') ? requested : fallback);
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : 'Login belum berhasil.');
+      setError(
+        caught instanceof Error ? caught.message : 'Login belum berhasil.',
+      );
     } finally {
       setLoading(false);
     }
@@ -42,11 +44,16 @@ export default function LoginPage() {
     <AuthShell>
       <div className="w-full">
         <p className="text-sm font-bold text-primary">Selamat datang kembali</p>
-        <h1 className="mt-2 text-3xl font-extrabold tracking-[-0.04em] text-slate-950">Masuk ke AstraCom</h1>
-        <p className="mt-3 text-sm leading-6 text-muted-foreground">Lanjutkan perjalanan dan kelola semua pesananmu dari satu tempat.</p>
+        <h1 className="page-title">Masuk ke TiketKilat</h1>
+        <p className="page-description">
+          Lanjutkan perjalanan dan kelola semua pesananmu dari satu tempat.
+        </p>
 
         {error && (
-          <Alert variant="destructive" className="mt-6 border-red-200 bg-red-50 p-3">
+          <Alert
+            variant="destructive"
+            className="legacy-danger-surface mt-6 border p-3"
+          >
             <AlertDescription>{error}</AlertDescription>
           </Alert>
         )}
@@ -55,31 +62,90 @@ export default function LoginPage() {
           <div className="space-y-2">
             <Label htmlFor="email">Alamat email</Label>
             <div className="relative">
-              <Mail className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
-              <Input id="email" type="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="nama@email.com" autoComplete="email" className="h-12 rounded-xl pl-10" required />
+              <Mail
+                className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
+                aria-hidden="true"
+              />
+              <Input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+                placeholder="nama@email.com"
+                autoComplete="email"
+                className="h-12 rounded-xl pl-10"
+                required
+              />
             </div>
           </div>
 
           <div className="space-y-2">
             <div className="flex items-center justify-between gap-3">
               <Label htmlFor="password">Password</Label>
-              <Link href="/forgot-password" className="text-xs font-bold text-primary hover:underline">Lupa password?</Link>
+              <Link
+                href="/forgot-password"
+                className="text-xs font-bold text-primary hover:underline"
+              >
+                Lupa password?
+              </Link>
             </div>
             <div className="relative">
-              <LockKeyhole className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
-              <Input id="password" type={showPassword ? 'text' : 'password'} value={password} onChange={(event) => setPassword(event.target.value)} placeholder="Masukkan password" autoComplete="current-password" className="h-12 rounded-xl px-10" required />
-              <button type="button" onClick={() => setShowPassword((value) => !value)} className="absolute right-1.5 top-1/2 grid size-9 -translate-y-1/2 cursor-pointer place-items-center rounded-lg text-muted-foreground hover:bg-muted focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/35" aria-label={showPassword ? 'Sembunyikan password' : 'Tampilkan password'}>
-                {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+              <LockKeyhole
+                className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
+                aria-hidden="true"
+              />
+              <Input
+                id="password"
+                type={showPassword ? 'text' : 'password'}
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+                placeholder="Masukkan password"
+                autoComplete="current-password"
+                className="h-12 rounded-xl pl-10 pr-12"
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((value) => !value)}
+                className="absolute right-0.5 top-1/2 grid size-11 -translate-y-1/2 cursor-pointer place-items-center rounded-lg text-muted-foreground hover:bg-muted focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/35"
+                aria-label={
+                  showPassword ? 'Sembunyikan password' : 'Tampilkan password'
+                }
+              >
+                {showPassword ? (
+                  <EyeOff className="size-4" />
+                ) : (
+                  <Eye className="size-4" />
+                )}
               </button>
             </div>
           </div>
 
-          <Button type="submit" size="lg" disabled={loading} className="h-12 w-full cursor-pointer rounded-xl text-sm font-bold shadow-[0_12px_26px_rgba(26,115,232,0.2)]">
-            {loading ? <><Spinner /> Memeriksa akun…</> : 'Masuk'}
+          <Button
+            type="submit"
+            size="lg"
+            disabled={loading}
+            className="h-12 w-full cursor-pointer rounded-xl text-sm font-bold shadow-[0_12px_26px_rgba(223,189,118,0.16)]"
+          >
+            {loading ? (
+              <>
+                <Spinner /> Memeriksa akun…
+              </>
+            ) : (
+              'Masuk'
+            )}
           </Button>
         </form>
 
-        <p className="mt-7 text-center text-sm text-muted-foreground">Belum punya akun? <Link href="/register" className="font-bold text-primary hover:underline">Daftar gratis</Link></p>
+        <p className="mt-7 text-center text-sm text-muted-foreground">
+          Belum punya akun?{' '}
+          <Link
+            href="/register"
+            className="font-bold text-primary hover:underline"
+          >
+            Daftar gratis
+          </Link>
+        </p>
       </div>
     </AuthShell>
   );

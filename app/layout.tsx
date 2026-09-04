@@ -9,33 +9,33 @@ export const metadata: Metadata = {
     process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000',
   ),
   title: {
-    default: 'AstraCom — Pesan Tiket Pesawat Tanpa Ribet',
-    template: '%s | AstraCom',
+    default: 'TiketKilat — Pesan Tiket Pesawat Tanpa Ribet',
+    template: '%s | TiketKilat',
   },
   description:
-    'Cari penerbangan, pesan tiket, lakukan pembayaran, dan pilih kursi dalam satu alur yang mudah bersama AstraCom.',
+    'Cari penerbangan, pesan tiket, lakukan pembayaran, dan pilih kursi dalam satu alur yang mudah bersama TiketKilat.',
   openGraph: {
     type: 'website',
     locale: 'id_ID',
-    siteName: 'AstraCom',
-    title: 'AstraCom — Temukan penerbangan terbaik, tanpa ribet.',
+    siteName: 'TiketKilat',
+    title: 'TiketKilat — Temukan penerbangan terbaik, tanpa ribet.',
     description:
       'Cari penerbangan, pesan tiket, lakukan pembayaran, dan pilih kursi dalam satu alur yang mudah.',
     images: [
       {
-        url: '/og.png',
-        width: 1200,
-        height: 630,
-        alt: 'AstraCom — Temukan penerbangan terbaik, tanpa ribet.',
+        url: '/og.png?v=tiketkilat',
+        width: 1731,
+        height: 909,
+        alt: 'TiketKilat — Temukan penerbangan terbaik, tanpa ribet.',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'AstraCom — Temukan penerbangan terbaik, tanpa ribet.',
+    title: 'TiketKilat — Temukan penerbangan terbaik, tanpa ribet.',
     description:
       'Cari penerbangan, pesan tiket, lakukan pembayaran, dan pilih kursi dalam satu alur yang mudah.',
-    images: ['/og.png'],
+    images: ['/og.png?v=tiketkilat'],
   },
 };
 
@@ -46,10 +46,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="id">
-      <body>
+      <body className="tiketkilat-luxe">
         <a
           href="#konten-utama"
-          className="sr-only fixed left-4 top-4 z-[100] rounded-lg bg-slate-950 px-4 py-3 font-bold text-white focus:not-sr-only focus:outline-none focus:ring-3 focus:ring-blue-300"
+          className="sr-only fixed left-4 top-4 z-[100] rounded-lg bg-primary px-4 py-3 font-bold text-primary-foreground focus:not-sr-only focus:outline-none focus:ring-3 focus:ring-ring"
         >
           Lewati ke konten utama
         </a>

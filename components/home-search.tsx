@@ -1,89 +1,221 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowRight, CalendarDays, MapPin, Repeat2 } from 'lucide-react';
+import {
+  ArrowLeftRight,
+  CalendarDays,
+  PlaneLanding,
+  PlaneTakeoff,
+  Search,
+} from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { NativeSelect, NativeSelectOption } from '@/components/ui/native-select';
+import {
+  NativeSelect,
+  NativeSelectOption,
+} from '@/components/ui/native-select';
+import { Spinner } from '@/components/ui/spinner';
+import {
+  flightAirlines,
+  flightCities,
+  flightSearchHref,
+  localDateValue,
+  validateHomeSearch,
+} from '@/lib/flight-search';
+
+const citySelectClass =
+  'w-full [&>select]:h-11 [&>select]:cursor-pointer [&>select]:rounded-sm [&>select]:border-0 [&>select]:px-0 [&>select]:pr-6 [&>select]:text-base [&>select]:font-bold [&>svg]:right-0';
 
 export function HomeSearch() {
   const router = useRouter();
   const [from, setFrom] = useState('Jakarta');
   const [to, setTo] = useState('Denpasar');
-  const [date, setDate] = useState('2026-09-10');
+  const [date, setDate] = useState('');
   const [airline, setAirline] = useState('');
+  const [error, setError] =
+    useState<ReturnType<typeof validateHomeSearch>>(null);
+  const [pending, startTransition] = useTransition();
 
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  function handleSubmit(event: React.SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
-    const query = new URLSearchParams({ dari: from, ke: to, tanggal: date });
-    if (airline) query.set('maskapai', airline);
-    router.push(`/flights?${query}`);
-  }
-
-  function swapCities() {
-    setFrom(to);
-    setTo(from);
+    const values = { from, to, date, airline };
+    const validation = validateHomeSearch(values);
+    setError(validation);
+    if (validation) {
+      document.getElementById(`home-${validation.field}`)?.focus();
+      return;
+    }
+    startTransition(() => router.push(flightSearchHref(values)));
   }
 
   return (
-    <form onSubmit={handleSubmit} className="grid gap-3 lg:grid-cols-[1fr_48px_1fr_0.9fr_0.9fr_auto] lg:items-end">
-      <div className="space-y-2">
-        <Label htmlFor="from">Dari</Label>
-        <div className="relative">
-          <MapPin className="pointer-events-none absolute left-3 top-1/2 z-10 size-4 -translate-y-1/2 text-primary" aria-hidden="true" />
-          <NativeSelect id="from" name="dari" value={from} onChange={(event) => setFrom(event.target.value)} className="h-12 w-full rounded-xl pl-10 font-semibold">
-            <NativeSelectOption value="Jakarta">Jakarta</NativeSelectOption>
-            <NativeSelectOption value="Surabaya">Surabaya</NativeSelectOption>
-            <NativeSelectOption value="Yogyakarta">Yogyakarta</NativeSelectOption>
-            <NativeSelectOption value="Makassar">Makassar</NativeSelectOption>
+    <form
+      action="/flights"
+      method="get"
+      onSubmit={handleSubmit}
+      aria-label="Cari tiket pesawat"
+      aria-busy={pending}
+    >
+      <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-[1.15fr_1.15fr_1fr_0.9fr_auto]">
+        <div className="relative min-w-0 rounded-md border border-input bg-card p-3.5 pr-9 transition-colors duration-200 focus-within:border-primary hover:border-primary/70 md:pr-7">
+          <Label
+            htmlFor="home-from"
+            className="flex items-center gap-2 text-sm font-medium text-muted-foreground"
+          >
+            <PlaneTakeoff className="size-4 text-primary" aria-hidden="true" />{' '}
+            Dari mana?
+          </Label>
+          <NativeSelect
+            id="home-from"
+            name="dari"
+            value={from}
+            onChange={(event) => {
+              setFrom(event.target.value);
+              setError(null);
+            }}
+            className={citySelectClass}
+          >
+            {flightCities.map((city) => (
+              <NativeSelectOption key={city} value={city}>
+                {city}
+              </NativeSelectOption>
+            ))}
+          </NativeSelect>
+          <Button
+            type="button"
+            variant="outline"
+            size="icon-lg"
+            onClick={() => {
+              setFrom(to);
+              setTo(from);
+              setError(null);
+            }}
+            className="absolute -bottom-7 right-4 z-10 size-11 cursor-pointer rounded-full border-input bg-card text-primary shadow-sm hover:bg-accent md:-right-7 md:bottom-auto md:top-1/2 md:-translate-y-1/2"
+            aria-label="Tukar kota keberangkatan dan tujuan"
+          >
+            <ArrowLeftRight
+              className="size-4 rotate-90 md:rotate-0"
+              aria-hidden="true"
+            />
+          </Button>
+        </div>
+
+        <div className="min-w-0 rounded-md border border-input bg-card p-3.5 pr-9 transition-colors duration-200 focus-within:border-primary hover:border-primary/70 md:pl-7 md:pr-3.5">
+          <Label
+            htmlFor="home-to"
+            className="flex items-center gap-2 text-sm font-medium text-muted-foreground"
+          >
+            <PlaneLanding className="size-4 text-primary" aria-hidden="true" />{' '}
+            Mau ke mana?
+          </Label>
+          <NativeSelect
+            id="home-to"
+            name="ke"
+            value={to}
+            onChange={(event) => {
+              setTo(event.target.value);
+              setError(null);
+            }}
+            aria-invalid={error?.field === 'to'}
+            aria-describedby={
+              error?.field === 'to' ? 'home-search-error' : undefined
+            }
+            className={citySelectClass}
+          >
+            {flightCities.map((city) => (
+              <NativeSelectOption key={city} value={city}>
+                {city === 'Denpasar' ? 'Denpasar, Bali' : city}
+              </NativeSelectOption>
+            ))}
           </NativeSelect>
         </div>
-      </div>
 
-      <div className="flex items-end justify-center lg:h-12">
-        <Button type="button" variant="outline" size="icon-lg" onClick={swapCities} className="size-11 cursor-pointer rounded-full border-blue-200 bg-blue-50 text-primary hover:bg-blue-100" aria-label="Tukar kota keberangkatan dan tujuan">
-          <Repeat2 className="size-4" />
+        <div className="min-w-0 rounded-md border border-input bg-card p-3.5 transition-colors duration-200 focus-within:border-primary hover:border-primary/70">
+          <Label
+            htmlFor="home-date"
+            className="flex items-center gap-2 text-sm font-medium text-muted-foreground"
+          >
+            <CalendarDays className="size-4 text-primary" aria-hidden="true" />{' '}
+            Tanggal berangkat
+          </Label>
+          <Input
+            id="home-date"
+            name="tanggal"
+            type="date"
+            onFocus={(event) => {
+              event.currentTarget.min = localDateValue();
+            }}
+            value={date}
+            onChange={(event) => {
+              setDate(event.target.value);
+              setError(null);
+            }}
+            aria-invalid={error?.field === 'date'}
+            aria-describedby={
+              error?.field === 'date' ? 'home-search-error' : 'home-date-hint'
+            }
+            className="h-11 cursor-pointer rounded-sm border-0 px-0 text-base font-bold md:text-base"
+          />
+        </div>
+
+        <div className="min-w-0 rounded-md border border-input bg-card p-3.5 transition-colors duration-200 focus-within:border-primary hover:border-primary/70">
+          <Label
+            htmlFor="home-airline"
+            className="text-sm font-medium text-muted-foreground"
+          >
+            Maskapai
+          </Label>
+          <NativeSelect
+            id="home-airline"
+            name="maskapai"
+            value={airline}
+            onChange={(event) => setAirline(event.target.value)}
+            className="w-full [&>select]:h-11 [&>select]:cursor-pointer [&>select]:rounded-sm [&>select]:border-0 [&>select]:px-0 [&>select]:font-semibold"
+          >
+            <NativeSelectOption value="">Semua maskapai</NativeSelectOption>
+            {flightAirlines.map((name) => (
+              <NativeSelectOption key={name} value={name}>
+                {name}
+              </NativeSelectOption>
+            ))}
+          </NativeSelect>
+        </div>
+
+        <Button
+          type="submit"
+          disabled={pending}
+          className="h-14 cursor-pointer gap-2 rounded-md px-6 text-base font-bold shadow-lg shadow-primary/10 md:h-full lg:min-w-44"
+        >
+          {pending ? (
+            <Spinner className="size-5" />
+          ) : (
+            <Search className="size-5" aria-hidden="true" />
+          )}
+          {pending ? 'Mencari…' : 'Cari penerbangan'}
         </Button>
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="to">Ke</Label>
-        <div className="relative">
-          <MapPin className="pointer-events-none absolute left-3 top-1/2 z-10 size-4 -translate-y-1/2 text-teal-600" aria-hidden="true" />
-          <NativeSelect id="to" name="ke" value={to} onChange={(event) => setTo(event.target.value)} className="h-12 w-full rounded-xl pl-10 font-semibold">
-            <NativeSelectOption value="Denpasar">Denpasar</NativeSelectOption>
-            <NativeSelectOption value="Makassar">Makassar</NativeSelectOption>
-            <NativeSelectOption value="Medan">Medan</NativeSelectOption>
-            <NativeSelectOption value="Yogyakarta">Yogyakarta</NativeSelectOption>
-          </NativeSelect>
-        </div>
-      </div>
+      {error && (
+        <p
+          id="home-search-error"
+          role="alert"
+          className="mt-3 text-sm font-medium text-destructive"
+        >
+          {error.message}
+        </p>
+      )}
 
-      <div className="space-y-2">
-        <Label htmlFor="date">Tanggal terbang</Label>
-        <div className="relative">
-          <CalendarDays className="pointer-events-none absolute left-3 top-1/2 z-10 size-4 -translate-y-1/2 text-primary" aria-hidden="true" />
-          <Input id="date" name="tanggal" type="date" value={date} onChange={(event) => setDate(event.target.value)} className="h-12 rounded-xl pl-10 font-semibold" required />
-        </div>
+      <div className="mt-4 flex justify-end">
+        <p
+          id="home-date-hint"
+          className="text-sm leading-6 text-muted-foreground"
+        >
+          Tanggal fleksibel? Kosongkan untuk melihat semua jadwal.
+        </p>
       </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="airline">Maskapai</Label>
-        <NativeSelect id="airline" name="maskapai" value={airline} onChange={(event) => setAirline(event.target.value)} className="h-12 w-full rounded-xl font-semibold">
-          <NativeSelectOption value="">Semua maskapai</NativeSelectOption>
-          <NativeSelectOption value="Garuda Indonesia">Garuda Indonesia</NativeSelectOption>
-          <NativeSelectOption value="Batik Air">Batik Air</NativeSelectOption>
-          <NativeSelectOption value="Lion Air">Lion Air</NativeSelectOption>
-        </NativeSelect>
-      </div>
-
-      <Button type="submit" size="lg" className="h-12 cursor-pointer rounded-xl px-6 text-sm font-bold shadow-[0_12px_28px_rgba(26,115,232,0.24)] lg:min-w-36">
-        Cari tiket
-        <ArrowRight className="size-4" />
-      </Button>
     </form>
   );
 }

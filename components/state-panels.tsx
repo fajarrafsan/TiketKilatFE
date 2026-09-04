@@ -13,7 +13,7 @@ import { Spinner } from '@/components/ui/spinner';
 
 export function LoadingPanel({ label = 'Memuat data…' }: { label?: string }) {
   return (
-    <div className="flex min-h-52 items-center justify-center rounded-2xl border border-border bg-white">
+    <div className="flex min-h-52 items-center justify-center rounded-xl border border-border bg-card">
       <div className="flex items-center gap-3 text-sm font-semibold text-muted-foreground">
         <Spinner className="size-5 text-primary" />
         {label}
@@ -22,19 +22,37 @@ export function LoadingPanel({ label = 'Memuat data…' }: { label?: string }) {
   );
 }
 
-export function ErrorPanel({ message, onRetry }: { message: string; onRetry?: () => void }) {
+export function ErrorPanel({
+  message,
+  onRetry,
+}: {
+  message: string;
+  onRetry?: () => void;
+}) {
   return (
-    <Empty className="min-h-52 border border-red-200 bg-red-50/60">
+    <Empty className="legacy-danger-surface min-h-52 border">
       <EmptyHeader>
-        <EmptyMedia variant="icon" className="bg-red-100 text-red-700">
+        <EmptyMedia
+          variant="icon"
+          className="bg-destructive/15 text-destructive"
+        >
           <AlertCircle />
         </EmptyMedia>
-        <EmptyTitle className="text-red-950">Data belum dapat dimuat</EmptyTitle>
-        <EmptyDescription className="text-red-800/80">{message}</EmptyDescription>
+        <EmptyTitle className="text-foreground">
+          Data belum dapat dimuat
+        </EmptyTitle>
+        <EmptyDescription className="text-muted-foreground">
+          {message}
+        </EmptyDescription>
       </EmptyHeader>
       {onRetry && (
         <EmptyContent>
-          <Button type="button" variant="outline" onClick={onRetry} className="h-11 cursor-pointer border-red-200 bg-white">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onRetry}
+            className="h-11 cursor-pointer border-destructive/30 bg-card"
+          >
             <RotateCcw className="size-4" />
             Coba lagi
           </Button>
@@ -44,11 +62,22 @@ export function ErrorPanel({ message, onRetry }: { message: string; onRetry?: ()
   );
 }
 
-export function EmptyPanel({ title, description, action }: { title: string; description: string; action?: React.ReactNode }) {
+export function EmptyPanel({
+  title,
+  description,
+  action,
+}: {
+  title: string;
+  description: string;
+  action?: React.ReactNode;
+}) {
   return (
-    <Empty className="min-h-52 border border-border bg-white">
+    <Empty className="min-h-52 border border-border bg-card">
       <EmptyHeader>
-        <EmptyMedia variant="icon" className="size-10 bg-blue-50 text-primary">
+        <EmptyMedia
+          variant="icon"
+          className="size-10 bg-primary/10 text-primary"
+        >
           <Inbox className="size-5" />
         </EmptyMedia>
         <EmptyTitle>{title}</EmptyTitle>

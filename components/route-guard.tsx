@@ -32,7 +32,7 @@ export function RouteGuard({
 
   if (!ready || !session || (role && session.role !== role)) {
     return (
-      <div className="grid min-h-screen place-items-center bg-background">
+      <div className="tiketkilat-luxe luxe-grid grid min-h-screen place-items-center bg-background text-foreground">
         <div className="flex items-center gap-3 text-sm font-semibold text-muted-foreground">
           <Spinner className="size-5 text-primary" />
           Menyiapkan akunmu…
